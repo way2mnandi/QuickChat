@@ -27,6 +27,7 @@ public class Main {
         while(loginStatus){
         loginStatus = u1.sessionActive;
         u1.mainMenu();
+        JOptionPane.showMessageDialog(null, u1.returnTotalMessages()+" Messages sent");
         JOptionPane.showMessageDialog(null, u1.printMessage());
         }
     }

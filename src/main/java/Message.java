@@ -12,6 +12,8 @@ import java.util.Random;
 
 import javax.swing.JOptionPane;
 public class Message {
+    int selectedOption = 0;
+    int totalMessagesSent;
     String RecepientcellNo;
     String recepientName;
     int messagesSent;
@@ -26,7 +28,7 @@ public class Message {
     boolean sessionActive = true;
     int over;
     public void mainMenu(){
-        Object[] options = {"|   1   |","|   2   |","|   3   |"};
+        Object[] options = {"    1    ","    2    ","   3    "};
         int menuSelection = JOptionPane.showOptionDialog(null, "Select An Option: \n1. Send Messages\n2. Display old messages\n3.Quit",
         "Welcome to QuickChat",
         JOptionPane.YES_NO_CANCEL_OPTION,
@@ -73,7 +75,7 @@ public class Message {
         messagesSent = Integer.parseInt(input);
         for (int i = 0; i < messagesSent; i++){
             writeMessage();
-            storeMessage();
+            sendMessage();
             info.append("ID: ").append(messageIDs.get(i)).append(" | Hash: ").append(messageHashes.get(i)).append(" | Message: ").append(storedMessages.get(i)).append("\n");
         }
 
@@ -87,6 +89,31 @@ public class Message {
             format = true;
         }
         return length&&format;
+    }
+    public String sendMessage(){
+        Object[] options = {"    1    ","    2    ","    3    ","    4    "};
+        int menuSelection = JOptionPane.showOptionDialog(null, "Select An Option: \n1. Send Message\n2. Disregard Message\n3.Store Message\n4. Proceed",
+        "What should happen with your message?",
+        JOptionPane.YES_NO_CANCEL_OPTION,
+        JOptionPane.INFORMATION_MESSAGE,
+        null,
+        options,
+        options[0]);
+        switch (menuSelection) {
+            case 0:
+                totalMessagesSent++;
+                return "Message sent";
+            case 1:
+                return"Message Deleted";
+            case 2:
+                storeMessage();
+                return "Message Stored successfully";
+            case 3:
+                selectedOption = 3;
+                return "Process complete";
+            default:
+                return "Process complete";
+        }
     }
     public String createMessageID(){
       boolean idValid = false;
@@ -119,22 +146,66 @@ public class Message {
         message = JOptionPane.showInputDialog("INSERT YOUR MESSAGE HERE : ");
         message = message.toUpperCase();
         JOptionPane.showMessageDialog(null, checkMessageLength(message));
+        if(messageLength){
+        while(selectedOption == 0){
+        JOptionPane.showMessageDialog(null, sendMessage());
         }
+        }
+    }
     }
     public String checkMessageLength(String message){
          if(message.length()>=250){
-            messageLength = true;
+            messageLength = false;
             this.over = message.length() - 250;
             return "Message exceeds 250 characters by "+over+", please reduce size";
          }
          else {
             messageLength = true;
-            return "Message sent successfully";
+            return "Message ready to send.";
          }
     }
     public void storeMessage(){
         storedMessages.add(message);
         messageHashes.add(createMessageHash(message)); //for future reference in part 3(arrays)
+        try {
+        // Use org.json to build JSON objects
+        org.json.JSONArray jsonArray = new org.json.JSONArray();
+
+        // Loop through stored messages and pair them with their IDs and hashes
+        for (int i = 0; i < storedMessages.size(); i++) {
+            org.json.JSONObject messageObject = new org.json.JSONObject();
+            messageObject.put("messageID", messageIDs.get(i));
+            messageObject.put("messageHash", messageHashes.get(i));
+            messageObject.put("recipient", RecepientcellNo);
+            messageObject.put("message", storedMessages.get(i));
+            jsonArray.put(messageObject);
+        }
+
+        // Wrap in a parent object
+        org.json.JSONObject root = new org.json.JSONObject();
+        root.put("messages", jsonArray);
+
+        // Write JSON file to project root
+        java.io.FileWriter file = new java.io.FileWriter("messages.json");
+        file.write(root.toString(4)); // formatted output
+        file.flush();
+        file.close();
+
+        JOptionPane.showMessageDialog(null, "Messages successfully stored in JSON file.");
+
+    } catch (Exception e) {
+        JOptionPane.showMessageDialog(null, "Error saving messages to JSON: " + e.getMessage());
+        e.printStackTrace();
+    }
+    /**
+    *Reference:
+    * OpenAI. 2025. ChatGPT. [Online]. 
+    * Available at: https://chat.openai.com/ 
+    * [Accessed 13 October 2025].
+    * 
+    * JSON Code generated with assistance from ChatGPT (OpenAI, 2025).
+    */
+        
 
     }
     public String printMessage(){
@@ -143,6 +214,9 @@ public class Message {
             sentMessages.append("ID: ").append(messageIDs.get(i)).append(" | Message: ").append(storedMessages.get(i)).append("\n");
         }
         return recepientName+"("+RecepientcellNo+")\n"+sentMessages.toString();
+    }
+    public int returnTotalMessages(){
+        return totalMessagesSent;
     }
 }
 

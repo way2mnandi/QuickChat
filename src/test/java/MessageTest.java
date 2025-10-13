@@ -11,7 +11,7 @@ public class MessageTest {
     @Test
     void testMessageLengthSuccess(){
         Message msg = new Message();
-        String expectedMessage = "Message sent successfully";
+        String expectedMessage = "Message ready to send.";
         String result = msg.checkMessageLength("Hi Mike, can you join us for dinner tonight");
         assertEquals(expectedMessage, result);
     }
@@ -29,5 +29,14 @@ public class MessageTest {
         String result = msg.createMessageHash("Hi Mike, can you join us for dinner tonight").toUpperCase().replaceAll("\\d{2}:\\d", "00:0");
         assertEquals(expectedMessage, result);
     }
+    @Test
+    void testMessageIDGeneration(){
+        Message msg = new Message();
+        String expectedMesssage = "0000000000";
+        String result = msg.createMessageID().replaceAll("\\d{10}", "0000000000");
+        assertEquals(expectedMesssage, result);
+    }
+
+    
     
 }
