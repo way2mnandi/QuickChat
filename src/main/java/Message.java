@@ -18,11 +18,13 @@ public class Message {
     int messageNumber = 0;
     String message;
     int retry = 3;
+    boolean messageLength = false;
     ArrayList<String> storedMessages = new ArrayList<>();
     ArrayList<String> messageIDs = new ArrayList<>();
     ArrayList<String> messageHashes = new ArrayList<>();
     StringBuilder info = new StringBuilder();
     boolean sessionActive = true;
+    int over;
     public void mainMenu(){
         Object[] options = {"|   1   |","|   2   |","|   3   |"};
         int menuSelection = JOptionPane.showOptionDialog(null, "Select An Option: \n1. Send Messages\n2. Display old messages\n3.Quit",
@@ -71,7 +73,7 @@ public class Message {
         messagesSent = Integer.parseInt(input);
         for (int i = 0; i < messagesSent; i++){
             writeMessage();
-            storeMessageInfo();
+            storeMessage();
             info.append("ID: ").append(messageIDs.get(i)).append(" | Hash: ").append(messageHashes.get(i)).append(" | Message: ").append(storedMessages.get(i)).append("\n");
         }
 
@@ -100,7 +102,6 @@ public class Message {
       }
       else{
         System.out.println("ID Generator failed, trying again....");
-        System.exit(0);
       }
       }
       return messageID.toString();
@@ -108,25 +109,40 @@ public class Message {
     public static boolean checkMessageID(String checkID){
         return checkID.length()<=10;
     }
-    public String createMessageHash(){
+    public String createMessageHash(String message){
         String[] hashWords = message.split(" ");
         messageNumber ++;
-        return createMessageID().substring(0,2)+";"+messageNumber+":"+hashWords[0]+hashWords[hashWords.length-1];
+        return createMessageID().substring(0,2)+":"+messageNumber+":"+hashWords[0]+hashWords[hashWords.length-1];
     }
     public void writeMessage(){
+        while(!messageLength){
         message = JOptionPane.showInputDialog("INSERT YOUR MESSAGE HERE: ");
         message = message.toUpperCase();
+        JOptionPane.showMessageDialog(null, checkMessageLength(message));
+        }
     }
-    public void storeMessageInfo(){
+    public String checkMessageLength(String message){
+         if(message.length()>=250){
+            messageLength = true;
+            this.over = message.length() - 250;
+            return "Message exceeds 250 characters by "+over+", please reduce size";
+         }
+         else {
+            messageLength = true;
+            return "Message sent successfully";
+         }
+    }
+    public void storeMessage(){
         storedMessages.add(message);
-        messageHashes.add(createMessageHash());
+        messageHashes.add(createMessageHash(message)); //for future reference in part 3(arrays)
+
     }
     public String printMessage(){
         StringBuilder sentMessages = new StringBuilder();
         for(int i = 0; i < messagesSent;i++){
             sentMessages.append("ID: ").append(messageIDs.get(i)).append(" | Message: ").append(storedMessages.get(i)).append("\n");
         }
-        return sentMessages.toString();
+        return recepientName+"("+RecepientcellNo+")\n"+sentMessages.toString();
     }
 }
 
