@@ -116,7 +116,7 @@ public class Message {
     }
     public void writeMessage(){
         while(!messageLength){
-        message = JOptionPane.showInputDialog("INSERT YOUR MESSAGE HERE: ");
+        message = JOptionPane.showInputDialog("INSERT YOUR MESSAGE HERE : ");
         message = message.toUpperCase();
         JOptionPane.showMessageDialog(null, checkMessageLength(message));
         }
