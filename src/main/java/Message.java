@@ -12,7 +12,7 @@ import java.util.Random;
 
 import javax.swing.JOptionPane;
 public class Message {
-    int selectedOption = 0;
+    String input;
     int totalMessagesSent;
     String RecepientcellNo;
     String recepientName;
@@ -71,12 +71,10 @@ public class Message {
             System.exit(0);
         }
         recepientName = JOptionPane.showInputDialog("Insert Recepient name: ");
-        String input = JOptionPane.showInputDialog("How many messages would you like to send?");
+         input = JOptionPane.showInputDialog("How many messages would you like to send?");
         messagesSent = Integer.parseInt(input);
         for (int i = 0; i < messagesSent; i++){
-            writeMessage();
-            sendMessage();
-            info.append("ID: ").append(messageIDs.get(i)).append(" | Hash: ").append(messageHashes.get(i)).append(" | Message: ").append(storedMessages.get(i)).append("\n");
+        writeMessage();
         }
 
     }
@@ -89,31 +87,6 @@ public class Message {
             format = true;
         }
         return length&&format;
-    }
-    public String sendMessage(){
-        Object[] options = {"    1    ","    2    ","    3    ","    4    "};
-        int menuSelection = JOptionPane.showOptionDialog(null, "Select An Option: \n1. Send Message\n2. Disregard Message\n3.Store Message\n4. Proceed",
-        "What should happen with your message?",
-        JOptionPane.YES_NO_CANCEL_OPTION,
-        JOptionPane.INFORMATION_MESSAGE,
-        null,
-        options,
-        options[0]);
-        switch (menuSelection) {
-            case 0:
-                totalMessagesSent++;
-                return "Message sent";
-            case 1:
-                return"Message Deleted";
-            case 2:
-                storeMessage();
-                return "Message Stored successfully";
-            case 3:
-                selectedOption = 3;
-                return "Process complete";
-            default:
-                return "Process complete";
-        }
     }
     public String createMessageID(){
       boolean idValid = false;
@@ -142,16 +115,39 @@ public class Message {
         return createMessageID().substring(0,2)+":"+messageNumber+":"+hashWords[0]+hashWords[hashWords.length-1];
     }
     public void writeMessage(){
-        while(!messageLength){
+        while(messagesSent > 0){
         message = JOptionPane.showInputDialog("INSERT YOUR MESSAGE HERE : ");
         message = message.toUpperCase();
-        JOptionPane.showMessageDialog(null, checkMessageLength(message));
-        if(messageLength){
-        while(selectedOption == 0){
-        JOptionPane.showMessageDialog(null, sendMessage());
-        }
+        sendMessage();
+        messagesSent --;
         }
     }
+    public String sendMessage(){
+        Object[] options = {"   1   ","   2   ","   3   "};
+        int Option = JOptionPane.showOptionDialog(null,
+        "1.Send Message\n2.Store Message\n3.Delete Message",
+        "Choose what to do with your message",
+        JOptionPane.YES_NO_CANCEL_OPTION,
+        JOptionPane.INFORMATION_MESSAGE,
+        null,
+        options, options[0]);
+        switch(Option){
+            case 0:
+            JOptionPane.showMessageDialog(null, checkMessageLength(message));
+            totalMessagesSent++;
+            storedMessages.add(message);
+            messageHashes.add(createMessageHash(message));
+             //for future reference in part 3(arrays)
+               storeMessage();
+               return "Message Sent Successfully";
+            case 1:
+               storeMessage();
+               return "Message Successully stored";
+            case 2:
+               return "Message Deleted";
+            default:
+               return "Message Successfully stored";
+        }
     }
     public String checkMessageLength(String message){
          if(message.length()>=250){
@@ -165,8 +161,6 @@ public class Message {
          }
     }
     public void storeMessage(){
-        storedMessages.add(message);
-        messageHashes.add(createMessageHash(message)); //for future reference in part 3(arrays)
         try {
         // Use org.json to build JSON objects
         org.json.JSONArray jsonArray = new org.json.JSONArray();
@@ -210,7 +204,7 @@ public class Message {
     }
     public String printMessage(){
         StringBuilder sentMessages = new StringBuilder();
-        for(int i = 0; i < messagesSent;i++){
+        for(int i = 0; i < storedMessages.size();i++){
             sentMessages.append("ID: ").append(messageIDs.get(i)).append(" | Message: ").append(storedMessages.get(i)).append("\n");
         }
         return recepientName+"("+RecepientcellNo+")\n"+sentMessages.toString();
