@@ -6,3 +6,7 @@
 12 October finished off message class logic and blended into main
    initialized git repo
    first commit
+16 November
+   added array searching functions
+     -search for hash to delete message
+     -search for id to list message
