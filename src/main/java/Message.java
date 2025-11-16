@@ -24,15 +24,21 @@ public class Message {
     boolean messageLength = false;
     ArrayList<String> storedMessages = new ArrayList<>();
     ArrayList<String> messageIDs = new ArrayList<>();
-    ArrayList<String> messageHashes = new ArrayList<>(); //arraylist logic to prep for part 3
+    ArrayList<String> messageHashes = new ArrayList<>();
+    ArrayList<String> sentMessages = new ArrayList<>();
+    ArrayList<String> disregardedMessages = new ArrayList<>();
+    ArrayList<String> messageFlag = new ArrayList<>();
+    ArrayList<String> recepients = new ArrayList<>();
+    ArrayList<String> names = new ArrayList<>();
     StringBuilder info = new StringBuilder();
     boolean sessionActive = true;
+    String searchIndex;
     int over;
     public void mainMenu(){ //action selection menu
-        Object[] options = {"    1    ","    2    ","   3    "};
-        int menuSelection = JOptionPane.showOptionDialog(null, "Select An Option: \n1. Send Messages\n2. Display old messages\n3.Quit",
+        Object[] options = {"    1    ","    2    ","   3    ","   4   ","  5  "};
+        int menuSelection = JOptionPane.showOptionDialog(null, "Select An Option: \n1. Send Messages\n2. Display Deleted messages\n3.Search for messages\n5.Delete a messagd using Hash\n4.Quit",
         "Welcome to QuickChat",
-        JOptionPane.YES_NO_CANCEL_OPTION,
+        JOptionPane.DEFAULT_OPTION,
         JOptionPane.INFORMATION_MESSAGE,
         null,
         options,
@@ -42,9 +48,17 @@ public class Message {
                 communicate();
                 break;
             case 1:
-                JOptionPane.showMessageDialog(null,"Coming Soon."); //part 3 feature
+                JOptionPane.showMessageDialog(null,"Disregarded "+ printDeletedMessages()); //part 3 feature
                 break;
             case 2:
+                searchIndex = JOptionPane.showInputDialog(null, "Insert Message ID:");
+                JOptionPane.showMessageDialog(null, searchMessageID(searchIndex));
+            case 3:
+                searchIndex = JOptionPane.showInputDialog("Insert Message Hash:");
+                if(deleteMessage(searchIndex)){
+                    JOptionPane.showMessageDialog(null, "Message successfully deleted.");
+                }
+            case 4:
                 sessionActive = false;
                 System.exit(0); //exits program when user selects exit
             default:
@@ -97,8 +111,8 @@ public class Message {
       long id = 1000000000L +(long)(ID.nextDouble()*8999999999L); //sets lenght and value rules for auto generated id
       String TempmessageID = String.valueOf(id); //sends id to another string to validate
       if(checkMessageID(TempmessageID)){
-      messageID.append(TempmessageID);
       messageIDs.add(TempmessageID);
+      messageID.append(TempmessageID);
       idValid = true;
       }
       else{
@@ -110,10 +124,11 @@ public class Message {
     public static boolean checkMessageID(String checkID){ //checks id length
         return checkID.length() ==10;
     }
-    public String createMessageHash(String message){ //creates message hash
+    public String createMessageHash(String message, String id){ //creates message hash
         String[] hashWords = message.split(" "); //removes  spaces in the messages to prepare for hash generatiin 
         messageNumber ++; //increments message number to generate correct hash
-        return createMessageID().substring(0,2)+":"+messageNumber+":"+hashWords[0]+hashWords[hashWords.length-1];
+        String messageHash = id.substring(0,2)+":"+messageNumber+":"+hashWords[0]+hashWords[hashWords.length-1];
+        return messageHash;
     }
     public void writeMessage(){ //method to write the message
         while(messagesSent > 0){ //runs until all required messages are processed
@@ -124,28 +139,56 @@ public class Message {
         }
     }
     public String sendMessage(){ //message action menu
-        Object[] options = {"   1   ","   2   ","   3   "}; //array of options
+        Object[] options = {"   1   ","   2   ","   3   ","CANCEL"}; //array of options
         this.Option = JOptionPane.showOptionDialog(null,  //pane with options for actions
-        "1.Send Message\n2.Store Message\n3.Delete Message",
+        "1.Send Message\n2.Store Message\n3. Disregard Message",
         "Choose what to do with your message",
-        JOptionPane.YES_NO_CANCEL_OPTION,
+        JOptionPane.DEFAULT_OPTION,
         JOptionPane.INFORMATION_MESSAGE,
         null,
         options, options[0]);
         switch(Option){
             case 0:
             JOptionPane.showMessageDialog(null, checkMessageLength(message)); //calls message length  checker
-            totalMessagesSent++; //increment for final window display
-            storedMessages.add(message); //adds the message into array
-            messageHashes.add(createMessageHash(message)); //adds message hash into hash array
              //for future reference in part 3(arrays)
                storeMessage();
+               totalMessagesSent++; //increment for final window display
+               storedMessages.add(message);
+               messageIDs.add(createMessageID()); //adds the message into array
+               for(int i = 0; i<storedMessages.size();i++){
+                if(storedMessages.get(i) == message){
+                   messageHashes.add(createMessageHash(message, messageIDs.get(i))); //adds message hash into hash array
+                }
+               }
+               messageFlag.add("sent");
+               recepients.add(RecepientcellNo);
+               names.add(recepientName);
                return "Message Sent Successfully";
             case 1:
                storeMessage();
+               storedMessages.add(message);
+               messageIDs.add(createMessageID());
+               for(int i = 0; i<storedMessages.size();i++){
+                if(storedMessages.get(i) == message){
+                   messageHashes.add(createMessageHash(message, messageIDs.get(i))); //adds message hash into hash array
+                }
+               }
+               messageFlag.add("stored");
+               recepients.add(RecepientcellNo);
+               names.add(recepientName);
                return "Message Successully stored";
             case 2:
-               return "Message Deleted";
+               storedMessages.add(message);
+               messageIDs.add(createMessageID());
+               for(int i = 0; i<storedMessages.size();i++){
+                if(storedMessages.get(i) == message){
+                   messageHashes.add(createMessageHash(message, messageIDs.get(i))); //adds message hash into hash array
+                }
+               }
+               messageFlag.add("disregarded");
+               recepients.add(RecepientcellNo);
+               names.add(recepientName);
+               return "Message Successully disregarded";
             default:
                return "Message Successfully stored";
         }
@@ -171,8 +214,10 @@ public class Message {
             org.json.JSONObject messageObject = new org.json.JSONObject();
             messageObject.put("messageID", messageIDs.get(i));
             messageObject.put("messageHash", messageHashes.get(i));
-            messageObject.put("recipient", RecepientcellNo);
+            messageObject.put("recipientCell", recepients.get(i));
+            messageObject.put("recepientName", names.get(i));
             messageObject.put("message", storedMessages.get(i));
+            messageObject.put("messageFlag", messageFlag.get(i));
             jsonArray.put(messageObject);
         }
 
@@ -186,10 +231,10 @@ public class Message {
         file.flush();
         file.close();
 
-        JOptionPane.showMessageDialog(null, "Messages successfully stored in JSON file.");
+        System.out.println("Messages successfully stored in JSON file.");
 
     } catch (Exception e) {
-        JOptionPane.showMessageDialog(null, "Error saving messages to JSON: " + e.getMessage());
+        System.out.println("Error saving messages to JSON: " + e.getMessage());
         e.printStackTrace();
     }
     /**
@@ -203,15 +248,53 @@ public class Message {
         
 
     }
-    public String printMessage(){ //prints the SENT messages and leaves out stored messages
+    public String printSentMessages(){ //prints the SENT messages and leaves out stored messages
         StringBuilder sentMessages = new StringBuilder();
-        for(int i = 0; i < storedMessages.size();i++){
-            sentMessages.append("ID: ").append(messageIDs.get(i)).append(" | Message: ").append(storedMessages.get(i)).append("\n");
+        for(int i = 0; i < messageFlag.size();i++){
+            if(messageFlag.get(i) == "sent"){
+            sentMessages.append("Name: "+names.get(i)).append(" | Cell No: "+recepients.get(i)).append(" | ID: ").append(messageIDs.get(i)).append(" | Message: ").append(storedMessages.get(i)).append("\n");
+            }
         }
-        return recepientName+"("+RecepientcellNo+")\n"+sentMessages.toString();
+        return sentMessages.toString();
+    }
+    public String printDeletedMessages(){
+        StringBuilder sentMessages = new StringBuilder();
+        for(int i = 0; i < messageFlag.size();i++){
+            if(messageFlag.get(i) == "disregarded"){
+            sentMessages.append("Name: "+names.get(i)).append(" | Cell No: "+recepients.get(i)).append(" | ID: ").append(messageIDs.get(i)).append(" | Message: ").append(storedMessages.get(i)).append("\n");
+            }
+        }
+        return sentMessages.toString();
     }
     public int returnTotalMessages(){
-        return totalMessagesSent; //shows how many messages were sent
+        return totalMessagesSent;
+     } //shows how many messages were sent
+    public String searchMessageID(String index){
+        StringBuilder result = new StringBuilder();
+        for(int i = 0; i<messageIDs.size();i++){
+            if(index == messageIDs.get(i)){
+            result.append("Name: "+names.get(i)).append(" | Cell No: "+recepients.get(i)).append(" | ID: ").append(messageIDs.get(i)).append(" | Message: ").append(storedMessages.get(i)).append(messageFlag.get(i)).append("\n");
+            }
+            else{
+            result.append("Message/ID not found.");
+            break;
+        }
+        }      
+        return result.toString();
+    }
+    public boolean deleteMessage(String index){
+        boolean found = false;
+        for(int i = 0;i<messageHashes.size();i++){
+            if(messageHashes.get(i) == index){
+                storedMessages.remove(i);
+                messageHashes.remove(i);
+                messageIDs.remove(i);
+                recepients.remove(i);
+                names.remove(i);
+                messageFlag.remove(i);
+            }
+        }
+        return found;
     }
 }
 

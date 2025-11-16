@@ -31,8 +31,8 @@ public class MessageTest {
     @Test
     void messageHashSuccess(){ //tests message hash creation
         Message msg = new Message();
-        String expectedMessage = String.format("00:0:HITONIGHT");
-        String result = msg.createMessageHash("Hi Mike, can you join us for dinner tonight").toUpperCase().replaceAll("\\d{2}:\\d", "00:0");
+        String expectedMessage = String.format("12:1:HITONIGHT");
+        String result = msg.createMessageHash(("Hi Mike, can you join us for dinner tonight").toUpperCase(), "1234567890");
         assertEquals(expectedMessage, result);
     }
     @Test
