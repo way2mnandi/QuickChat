@@ -38,9 +38,48 @@ public class MessageTest {
     @Test
     void testMessageIDGeneration(){ //tests id generation
         Message msg = new Message();
-        String expectedMesssage = "0000000000";
-        String result = msg.createMessageID().replaceAll("\\d{10}", "0000000000");
-        assertEquals(expectedMesssage, result);
+        String result = msg.createMessageID();
+        assertTrue(result.matches("\\d{10}"));
+    }
+    @Test
+    void testMessageDeleteFailure(){ //tests a failed message delete attempt
+        Message msg = new Message();
+        String ID = msg.createMessageID(); //generates new ID within the program to run hash genereation
+        String hash = msg.createMessageHash("Where are you? You are late! I have asked you to be on time", ID);
+        //creates hash using generated ID + test data
+        assertEquals("Message not found", msg.deleteMessage(hash));
+    }
+    @Test
+    void testMessageDeleteSuccess(){ //test message delete successful attempt
+        Message msg = new Message();
+        String ID = msg.createMessageID();
+        String hash = msg.createMessageHash("Where are you? You are late! I have asked you to be on time", ID);
+        msg.storedMessages.add("Where are you? You are late! I have asked you to be on time");
+        msg.messageHashes.add(hash); msg.messageIDs.add(ID); msg.recepients.add("27838884567");
+        msg.names.add("Test2");msg.messageFlag.add("disregard"); //fully populates arrays to test delete function accuracy
+        assertEquals("Message successfully deleted", msg.deleteMessage(hash));
+    }
+    @Test
+    void longestMessageTest(){ //tests the longest message checker
+        Message msg = new Message();
+        msg.storedMessages.add("Did you get the cake?");
+        msg.storedMessages.add("Where are you? You are late! I have asked you to be on time.");
+        msg.storedMessages.add("Yohoooo, I am at your gate.");
+        msg.storedMessages.add("It is dinner time!"); //populates message arrays only
+        assertEquals("Where are you? You are late! I have asked you to be on time.",msg.returnLongestMessage());
+
+    }
+    @Test
+    void searchMessageIDTest(){
+        Message msg = new Message();
+        String ID;
+        ID = msg.createMessageID();
+        String hash = msg.createMessageHash("It is dinner time!", ID);
+        msg.storedMessages.add("It is dinner time!");
+        msg.messageHashes.add(hash); msg.messageIDs.add(ID); msg.recepients.add("0838884567");
+        msg.names.add("Test4");msg.messageFlag.add("disregard"); //fully populates arrays to test delete function accuracy
+        String expectedMessage = "Name: Test4 | Cell No: 0838884567 | ID: "+ID+" | Message: It is dinner time! | disregard"+"\n";
+        assertEquals(expectedMessage, msg.searchMessageID(ID));
     }
 
     

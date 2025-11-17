@@ -55,9 +55,7 @@ public class Message {
                 JOptionPane.showMessageDialog(null, searchMessageID(searchIndex));
             case 3:
                 searchIndex = JOptionPane.showInputDialog("Insert Message Hash:");
-                if(deleteMessage(searchIndex)){
-                    JOptionPane.showMessageDialog(null, "Message successfully deleted.");
-                }
+                JOptionPane.showMessageDialog(null, deleteMessage(searchIndex));
             case 4:
                 sessionActive = false;
                 System.exit(0); //exits program when user selects exit
@@ -270,19 +268,20 @@ public class Message {
         return totalMessagesSent;
      } //shows how many messages were sent
     public String searchMessageID(String index){
+        boolean found = false;
         StringBuilder result = new StringBuilder();
         for(int i = 0; i<messageIDs.size();i++){
-            if(index == messageIDs.get(i)){
-            result.append("Name: "+names.get(i)).append(" | Cell No: "+recepients.get(i)).append(" | ID: ").append(messageIDs.get(i)).append(" | Message: ").append(storedMessages.get(i)).append(messageFlag.get(i)).append("\n");
-            }
-            else{
-            result.append("Message/ID not found.");
+            if(index.equals(messageIDs.get(i))){
+            found = true;
+            result.append("Name: "+names.get(i)).append(" | Cell No: "+recepients.get(i)).append(" | ID: ").append(messageIDs.get(i)).append(" | Message: ").append(storedMessages.get(i)).append(" | ").append(messageFlag.get(i)).append("\n");
             break;
+            }
         }
-        }      
+        if(found)      
         return result.toString();
+        else return "Message or ID not found";
     }
-    public boolean deleteMessage(String index){
+    public String deleteMessage(String index){
         boolean found = false;
         for(int i = 0;i<messageHashes.size();i++){
             if(messageHashes.get(i) == index){
@@ -292,9 +291,21 @@ public class Message {
                 recepients.remove(i);
                 names.remove(i);
                 messageFlag.remove(i);
+                found = true;
             }
         }
-        return found;
+        if(found)
+        return "Message successfully deleted";
+        else return "Message not found";
+    }
+    public String returnLongestMessage(){
+        String longest = storedMessages.get(0);
+        for(int i = 1; i<storedMessages.size();i++){
+            if(storedMessages.get(i).length()>longest.length()){
+                longest = storedMessages.get(i);
+            }
+        }
+        return longest;
     }
 }
 
