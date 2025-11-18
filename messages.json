@@ -1,14 +1,8 @@
-{"messages": [
-    {
-        "recipient": "27827449266",
-        "messageID": "9624698130",
-        "messageHash": "96:1:HELLOCOMING",
-        "message": "HELLO ARE YOU COMING"
-    },
-    {
-        "recipient": "27827449266",
-        "messageID": "3915525789",
-        "messageHash": "39:2:BYEMAN",
-        "message": "BYE BYE MAN"
-    }
-]}
+{"messages": [{
+    "recipientCell": "27654439898",
+    "messageID": "2745958391",
+    "messageHash": "27:1:WHATCOMING?",
+    "message": "WHAT TIME ARE YOU COMING?",
+    "messageFlag": "sent",
+    "recepientName": "Allende"
+}]}

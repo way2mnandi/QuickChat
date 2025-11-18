@@ -35,8 +35,8 @@ public class Message {
     String searchIndex;
     int over;
     public void mainMenu(){ //action selection menu
-        Object[] options = {"    1    ","    2    ","   3    ","   4   ","  5  "};
-        int menuSelection = JOptionPane.showOptionDialog(null, "Select An Option: \n1. Send Messages\n2. Display Deleted messages\n3.Search for messages\n5.Delete a messagd using Hash\n4.Quit",
+        Object[] options = {"    1    ","    2    ","   3    ","   4   "};
+        int menuSelection = JOptionPane.showOptionDialog(null, "Select An Option: \n1. Send Messages\n2.Search for messages\n3.Delete a message using Hash\n4.Quit",
         "Welcome to QuickChat",
         JOptionPane.DEFAULT_OPTION,
         JOptionPane.INFORMATION_MESSAGE,
@@ -48,18 +48,44 @@ public class Message {
                 communicate();
                 break;
             case 1:
-                JOptionPane.showMessageDialog(null,"Disregarded "+ printDeletedMessages()); //part 3 feature
+                searchMenu();
                 break;
             case 2:
-                searchIndex = JOptionPane.showInputDialog(null, "Insert Message ID:");
-                JOptionPane.showMessageDialog(null, searchMessageID(searchIndex));
-            case 3:
                 searchIndex = JOptionPane.showInputDialog("Insert Message Hash:");
                 JOptionPane.showMessageDialog(null, deleteMessage(searchIndex));
-            case 4:
+            case 3:
                 sessionActive = false;
                 System.exit(0); //exits program when user selects exit
+            case 4:
+                JOptionPane.showMessageDialog(null, printSentMessages());
+                break;
             default:
+                break;
+        }
+    }
+    public void searchMenu(){
+        Object[] options = {"   1   ","   2   ","   3   ","   4   ","   5   "};
+        int menuSelection = JOptionPane.showOptionDialog(null,"1.Seach by ID\n2.Search by recepient\n3.Display sent messages\n4.Show longest message\n5.Show deleted messages",
+        "Search Menu",
+        JOptionPane.DEFAULT_OPTION,
+        JOptionPane.INFORMATION_MESSAGE,
+        null,
+        options,
+        options[0]);
+        switch (menuSelection){
+            case 0:
+                searchIndex = JOptionPane.showInputDialog(null, "Insert Message ID:");
+                JOptionPane.showMessageDialog(null, searchMessageID(searchIndex));
+            case 1:
+                searchIndex = JOptionPane.showInputDialog("Insert recepient name or number: ");
+                JOptionPane.showMessageDialog(null, searchByRecepient(searchIndex));
+            case 2:
+                JOptionPane.showMessageDialog(null, printSentMessages());
+            case 3:
+                JOptionPane.showMessageDialog(null, returnLongestMessage());
+            case 4:
+                JOptionPane.showMessageDialog(null, printDeletedMessages());
+            default :
                 break;
         }
     }
@@ -203,6 +229,7 @@ public class Message {
          }
     }
     public void storeMessage(){
+        String path = "QuickChat/messages.json";
         try {
         // Use org.json to build JSON objects
         org.json.JSONArray jsonArray = new org.json.JSONArray();
@@ -224,7 +251,7 @@ public class Message {
         root.put("messages", jsonArray);
 
         // Write JSON file to project root
-        java.io.FileWriter file = new java.io.FileWriter("messages.json");
+        java.io.FileWriter file = new java.io.FileWriter(path);
         file.write(root.toString(4)); // formatted output
         file.flush();
         file.close();
@@ -306,6 +333,22 @@ public class Message {
             }
         }
         return longest;
+    }
+    public String searchByRecepient(String recepient){
+        recepient.replaceAll("^(\\+27|27|0)", "");
+        boolean found = false;
+        StringBuilder result = new StringBuilder();
+        for(int i = 0; i<recepients.size();i++){
+            if(recepients.get(i).replaceAll("^(\\+27|27|0)", "").equalsIgnoreCase(recepient.replaceAll("^(\\+27|27|0)", "")) || names.get(i).equalsIgnoreCase(recepient)){
+                found = true;
+                result.append(storedMessages.get(i)+"\n");
+            }
+        }
+        if(found) return result.toString();
+        else return "Recepient not found";
+    }
+    public void restoreMemory(){
+
     }
 }
 
