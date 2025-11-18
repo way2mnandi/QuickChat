@@ -17,7 +17,7 @@ public class MessageTest {
     @Test
     void testMessageLengthSuccess(){ //tests message length validator on success
         Message msg = new Message();
-        String expectedMessage = "Message ready to send.";
+        String expectedMessage = "Message sent.";
         String result = msg.checkMessageLength("Hi Mike, can you join us for dinner tonight");
         assertEquals(expectedMessage, result);
     }

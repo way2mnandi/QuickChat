@@ -7,10 +7,16 @@
  *
  * @author RC_Student_Lab
  */
+import java.io.File;
+import java.io.FileWriter;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.JOptionPane;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 public class Message {
     int Option;
     String input;
@@ -53,6 +59,7 @@ public class Message {
             case 2:
                 searchIndex = JOptionPane.showInputDialog("Insert Message Hash:");
                 JOptionPane.showMessageDialog(null, deleteMessage(searchIndex));
+                break;
             case 3:
                 sessionActive = false;
                 System.exit(0); //exits program when user selects exit
@@ -76,15 +83,20 @@ public class Message {
             case 0:
                 searchIndex = JOptionPane.showInputDialog(null, "Insert Message ID:");
                 JOptionPane.showMessageDialog(null, searchMessageID(searchIndex));
+                break;
             case 1:
                 searchIndex = JOptionPane.showInputDialog("Insert recepient name or number: ");
                 JOptionPane.showMessageDialog(null, searchByRecepient(searchIndex));
+                break;
             case 2:
                 JOptionPane.showMessageDialog(null, printSentMessages());
+                break;
             case 3:
                 JOptionPane.showMessageDialog(null, returnLongestMessage());
+                break;
             case 4:
                 JOptionPane.showMessageDialog(null, printDeletedMessages());
+                break;
             default :
                 break;
         }
@@ -135,7 +147,6 @@ public class Message {
       long id = 1000000000L +(long)(ID.nextDouble()*8999999999L); //sets lenght and value rules for auto generated id
       String TempmessageID = String.valueOf(id); //sends id to another string to validate
       if(checkMessageID(TempmessageID)){
-      messageIDs.add(TempmessageID);
       messageID.append(TempmessageID);
       idValid = true;
       }
@@ -171,11 +182,11 @@ public class Message {
         JOptionPane.INFORMATION_MESSAGE,
         null,
         options, options[0]);
+        String returnMessage;
         switch(Option){
             case 0:
             JOptionPane.showMessageDialog(null, checkMessageLength(message)); //calls message length  checker
              //for future reference in part 3(arrays)
-               storeMessage();
                totalMessagesSent++; //increment for final window display
                storedMessages.add(message);
                messageIDs.add(createMessageID()); //adds the message into array
@@ -187,9 +198,9 @@ public class Message {
                messageFlag.add("sent");
                recepients.add(RecepientcellNo);
                names.add(recepientName);
-               return "Message Sent Successfully";
+               returnMessage = "Message Sent Successfully";
+               break;
             case 1:
-               storeMessage();
                storedMessages.add(message);
                messageIDs.add(createMessageID());
                for(int i = 0; i<storedMessages.size();i++){
@@ -200,7 +211,8 @@ public class Message {
                messageFlag.add("stored");
                recepients.add(RecepientcellNo);
                names.add(recepientName);
-               return "Message Successully stored";
+               returnMessage = "Message Successully stored";
+               break;
             case 2:
                storedMessages.add(message);
                messageIDs.add(createMessageID());
@@ -212,10 +224,14 @@ public class Message {
                messageFlag.add("disregarded");
                recepients.add(RecepientcellNo);
                names.add(recepientName);
-               return "Message Successully disregarded";
+               returnMessage = "Message Successully disregarded";
+               break;
             default:
-               return "Message Successfully stored";
+               returnMessage = "Message Successfully stored";
+               break;
         }
+        storeMessage();
+        return returnMessage;
     }
     public String checkMessageLength(String message){ //ensures message length is not above 50
          if(message.length()>=250){
@@ -225,7 +241,7 @@ public class Message {
          }
          else {
             messageLength = true;
-            return "Message ready to send.";
+            return "Message sent.";
          }
     }
     public void storeMessage(){
@@ -276,7 +292,7 @@ public class Message {
     public String printSentMessages(){ //prints the SENT messages and leaves out stored messages
         StringBuilder sentMessages = new StringBuilder();
         for(int i = 0; i < messageFlag.size();i++){
-            if(messageFlag.get(i) == "sent"){
+            if(messageFlag.get(i).equalsIgnoreCase("sent")){
             sentMessages.append("Name: "+names.get(i)).append(" | Cell No: "+recepients.get(i)).append(" | ID: ").append(messageIDs.get(i)).append(" | Message: ").append(storedMessages.get(i)).append("\n");
             }
         }
@@ -285,7 +301,7 @@ public class Message {
     public String printDeletedMessages(){
         StringBuilder sentMessages = new StringBuilder();
         for(int i = 0; i < messageFlag.size();i++){
-            if(messageFlag.get(i) == "disregarded"){
+            if(messageFlag.get(i).equalsIgnoreCase("disregarded")){
             sentMessages.append("Name: "+names.get(i)).append(" | Cell No: "+recepients.get(i)).append(" | ID: ").append(messageIDs.get(i)).append(" | Message: ").append(storedMessages.get(i)).append("\n");
             }
         }
@@ -311,14 +327,16 @@ public class Message {
     public String deleteMessage(String index){
         boolean found = false;
         for(int i = 0;i<messageHashes.size();i++){
-            if(messageHashes.get(i) == index){
+            if(messageHashes.get(i).equals(index)){
                 storedMessages.remove(i);
                 messageHashes.remove(i);
                 messageIDs.remove(i);
                 recepients.remove(i);
                 names.remove(i);
                 messageFlag.remove(i);
+                deleteFromJson(index);
                 found = true;
+                break;
             }
         }
         if(found)
@@ -348,7 +366,109 @@ public class Message {
         else return "Recepient not found";
     }
     public void restoreMemory(){
+         try {
+        File file = new File("QuickChat/messages.json");
+        if (!file.exists()) {
+            System.out.println("No stored messages found.");
+            return;
+        }
 
+        String content = new String(Files.readAllBytes(file.toPath()));
+        JSONObject root = new JSONObject(content);
+        JSONArray arr = root.getJSONArray("messages");
+
+        // Clear arrays first to avoid duplicates
+        storedMessages.clear();
+        messageIDs.clear();
+        messageHashes.clear();
+        recepients.clear();
+        names.clear();
+        messageFlag.clear();
+
+        for (int i = 0; i < arr.length(); i++) {
+            JSONObject obj = arr.getJSONObject(i);
+
+            messageIDs.add(obj.getString("messageID"));
+            messageHashes.add(obj.getString("messageHash"));
+            recepients.add(obj.getString("recipientCell"));
+            names.add(obj.getString("recepientName"));
+            storedMessages.add(obj.getString("message"));
+            messageFlag.add(obj.getString("messageFlag"));
+        }
+
+        System.out.println("Stored messages successfully loaded.");
+
+    } catch (Exception e) {
+        System.out.println("Error loading messages: " + e.getMessage());
+        e.printStackTrace();
+    }
+    /**
+    *Reference:
+    * OpenAI. 2025. ChatGPT. [Online]. 
+    * Available at: https://chat.openai.com/ 
+    * [Accessed 18 Novemebr 2025].
+    * 
+    * JSON Code generated with assistance from ChatGPT (OpenAI, 2025).
+    */
+    }
+    public void deleteFromJson(String targetHash){ //method to rewrite json file with deleted message removed
+        try {
+        String path = "QuickChat/messages.json";
+        File file = new File(path);
+
+        if (!file.exists()) {
+            System.out.println("JSON file not found.");
+            return;
+        }
+
+        // Load JSON file
+        String content = new String(Files.readAllBytes(file.toPath()));
+        JSONObject root = new JSONObject(content);
+        JSONArray arr = root.getJSONArray("messages");
+
+        // New array to store messages that are NOT deleted
+        JSONArray updatedArr = new JSONArray();
+
+        boolean found = false;
+
+        // Loop through and copy everything except the message to delete
+        for (int i = 0; i < arr.length(); i++) {
+            JSONObject obj = arr.getJSONObject(i);
+
+            if (obj.getString("messageHash").equals(targetHash)) {
+                found = true; // message matched → skip adding to updated array
+                continue;
+            }
+
+            updatedArr.put(obj); // keep message
+        }
+
+        if (!found) {
+            System.out.println("Message hash not found in JSON.");
+            return;
+        }
+
+        // Save updated JSON back to file
+        JSONObject newRoot = new JSONObject();
+        newRoot.put("messages", updatedArr);
+
+        FileWriter writer = new FileWriter(path);
+        writer.write(newRoot.toString(4)); // pretty print
+        writer.close();
+
+        System.out.println("Message removed from JSON.");
+
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    /**
+    *Reference:
+    * OpenAI. 2025. ChatGPT. [Online]. 
+    * Available at: https://chat.openai.com/ 
+    * [Accessed 18 Novemebr 2025].
+    * 
+    * JSON Code generated with assistance from ChatGPT (OpenAI, 2025).
+    */
     }
 }
 

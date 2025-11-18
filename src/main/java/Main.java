@@ -23,6 +23,7 @@ public class Main {
         else {
             System.exit(0);
         }
+        u1.restoreMemory();
         loginStatus = user1.activeStatus;
         while(loginStatus){
         loginStatus = u1.sessionActive;

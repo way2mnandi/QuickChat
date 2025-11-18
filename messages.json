@@ -1,8 +1,34 @@
-{"messages": [{
-    "recipientCell": "27654439898",
-    "messageID": "2745958391",
-    "messageHash": "27:1:WHATCOMING?",
-    "message": "WHAT TIME ARE YOU COMING?",
-    "messageFlag": "sent",
-    "recepientName": "Allende"
-}]}
+{"messages": [
+    {
+        "recipientCell": "27654439898",
+        "messageID": "2745958391",
+        "messageHash": "27:1:WHATCOMING?",
+        "message": "WHAT TIME ARE YOU COMING?",
+        "messageFlag": "sent",
+        "recepientName": "Allende"
+    },
+    {
+        "recipientCell": "27654439898",
+        "messageID": "9407501672",
+        "messageHash": "94:1:ITOO",
+        "message": "I AM ACTUALLY ON MY WAY TOO",
+        "messageFlag": "sent",
+        "recepientName": "Allende"
+    },
+    {
+        "recipientCell": "27690478899",
+        "messageID": "5091119030",
+        "messageHash": "50:1:YOUBALLONDOR.",
+        "message": "YOU CHEATED THE BALLONDOR.",
+        "messageFlag": "sent",
+        "recepientName": "Messi"
+    },
+    {
+        "recipientCell": "27654498876",
+        "messageID": "8845079437",
+        "messageHash": "88:3:WELLPTA!",
+        "message": "WELL AT LEAST ITS NOT AS HOT AS PTA!",
+        "messageFlag": "disregarded",
+        "recepientName": "Paul"
+    }
+]}
