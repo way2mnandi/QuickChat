@@ -6,7 +6,7 @@ public class MessageTest {
     @Test
     void TestRecepientCellValidator(){
         assertTrue(Message.checkRecepientCell("+27718693002\r"));
-        assertFalse(Message.checkMessageID("08575975889")); //tests cell no validation
+        assertFalse(Message.checkRecepientCell("08575975889")); //tests cell no validation
     }
     @Test
     void testMessageIDvalidator(){
@@ -55,9 +55,9 @@ public class MessageTest {
         String ID = msg.createMessageID();
         String hash = msg.createMessageHash("Where are you? You are late! I have asked you to be on time", ID);
         msg.storedMessages.add("Where are you? You are late! I have asked you to be on time");
-        msg.messageHashes.add(hash); msg.messageIDs.add(ID); msg.recepients.add("27838884567");
-        msg.names.add("Test2");msg.messageFlag.add("disregard"); //fully populates arrays to test delete function accuracy
-        assertEquals("Message successfully deleted", msg.deleteMessage(hash));
+        msg.messageHashes.add(hash); msg.messageIDs.add(ID); msg.recepients.add("+27838884567");
+        msg.names.add("test2");msg.messageFlag.add("stored"); //fully populates arrays to test delete function accuracy
+        assertEquals("Message ("+msg.storedMessages.get(0)+") successfully deleted", msg.deleteMessage(hash));
     }
     @Test
     void longestMessageTest(){ //tests the longest message checker
@@ -77,27 +77,28 @@ public class MessageTest {
         String hash = msg.createMessageHash("It is dinner time!", ID);
         msg.storedMessages.add("It is dinner time!");
         msg.messageHashes.add(hash); msg.messageIDs.add(ID); msg.recepients.add("0838884567");
-        msg.names.add("Test4");msg.messageFlag.add("disregard"); //fully populates arrays to test delete function accuracy
-        String expectedMessage = "Name: Test4 | Cell No: 0838884567 | ID: "+ID+" | Message: It is dinner time! | disregard"+"\n";
+        msg.names.add("test4");msg.messageFlag.add("sent"); //fully populates arrays to test delete function accuracy
+        String expectedMessage = "Name: test4 | Cell No: 0838884567 | ID: "+ID+" | Message: It is dinner time! | sent"+"\n";
         assertEquals(expectedMessage, msg.searchMessageID(ID));
     }
     @Test
     void sentMessageSearchTest(){
         Message msg = new Message();
-        msg.storedMessages.add("Did you get the cake?"); msg.names.add("test1"); msg.recepients.add("+27834557896");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("disregarded");
-        msg.storedMessages.add("Where are you? You are late! I have asked you to be on time.");msg.names.add("test2"); msg.recepients.add("+27734557896");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("disregarded");
-        msg.storedMessages.add("Yohoooo, I am at your gate.");msg.names.add("test3"); msg.recepients.add("+27834657896");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("sent");
-        msg.storedMessages.add("It is dinner time!"); msg.names.add("test4"); msg.recepients.add("+27834567896");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("stored");
-        String expectedMessage = "Name: test3 | Cell No: +27834657896 | ID: "+msg.messageIDs.get(2)+" | Message: Yohoooo, I am at your gate.\n";
+        msg.storedMessages.add("Did you get the cake?"); msg.names.add("test1"); msg.recepients.add("+27834557896");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("sent");
+        msg.storedMessages.add("Where are you? You are late! I have asked you to be on time.");msg.names.add("test2"); msg.recepients.add("+27838884567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("stored");
+        msg.storedMessages.add("Yohoooo, I am at your gate.");msg.names.add("test3"); msg.recepients.add("+27834484567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("disregarded");
+        msg.storedMessages.add("It is dinner time!"); msg.names.add("test4"); msg.recepients.add("0838884567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("sent");
+        String expectedMessage = "Name: test1 | Cell No: +27834557896 | ID: "+msg.messageIDs.get(0)+" | Message: Did you get the cake?\n"+
+                                 "Name: test4 | Cell No: 0838884567 | ID: "+msg.messageIDs.get(3)+" | Message: It is dinner time!\n";
         assertEquals(expectedMessage, msg.printSentMessages());
     }
     @Test
     void recepientSearchTest(){
         Message msg = new Message();
-        msg.storedMessages.add("Did you get the cake?"); msg.names.add("test1"); msg.recepients.add("+27834557896");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("disregarded");
-        msg.storedMessages.add("Where are you? You are late! I have asked you to be on time.");msg.names.add("test2"); msg.recepients.add("+27838884567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("disregarded");
-        msg.storedMessages.add("Yohoooo, I am at your gate.");msg.names.add("test3"); msg.recepients.add("+27834657896");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("sent");
-        msg.storedMessages.add("It is dinner time!"); msg.names.add("test4"); msg.recepients.add("+27834567896");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("stored");
+        msg.storedMessages.add("Did you get the cake?"); msg.names.add("test1"); msg.recepients.add("+27834557896");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("sent");
+        msg.storedMessages.add("Where are you? You are late! I have asked you to be on time.");msg.names.add("test2"); msg.recepients.add("+27838884567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("stored");
+        msg.storedMessages.add("Yohoooo, I am at your gate.");msg.names.add("test3"); msg.recepients.add("+27834484567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("disregared");
+        msg.storedMessages.add("It is dinner time!"); msg.names.add("test4"); msg.recepients.add("0838884567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("sent");
         msg.storedMessages.add("Ok, I am leaving without you"); msg.names.add("test5"); msg.recepients.add("+27838884567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("stored");
         String expectedMessage = "Where are you? You are late! I have asked you to be on time.\nOk, I am leaving without you\n";
         assertEquals(expectedMessage, msg.searchByRecepient("27838884567"));

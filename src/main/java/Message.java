@@ -41,8 +41,8 @@ public class Message {
     String searchIndex;
     int over;
     public void mainMenu(){ //action selection menu
-        Object[] options = {"    1    ","    2    ","   3    ","   4   "};
-        int menuSelection = JOptionPane.showOptionDialog(null, "Select An Option: \n1. Send Messages\n2.Search for messages\n3.Delete a message using Hash\n4.Quit",
+        Object[] options = {"    1    ","    2    ","   3    ","   4   ","   5   "};
+        int menuSelection = JOptionPane.showOptionDialog(null, "Select An Option: \n1. Send Messages\n2.Search for messages\n3.Delete a message using Hash\n4.Show all messages.\n5.Quit",
         "Welcome to QuickChat",
         JOptionPane.DEFAULT_OPTION,
         JOptionPane.INFORMATION_MESSAGE,
@@ -61,10 +61,11 @@ public class Message {
                 JOptionPane.showMessageDialog(null, deleteMessage(searchIndex));
                 break;
             case 3:
+                JOptionPane.showMessageDialog(null, showMessageReport());
+                break;
+            case 4:
                 sessionActive = false;
                 System.exit(0); //exits program when user selects exit
-            case 4:
-                JOptionPane.showMessageDialog(null, printSentMessages());
                 break;
             default:
                 break;
@@ -324,10 +325,20 @@ public class Message {
         return result.toString();
         else return "Message or ID not found";
     }
+    public String showMessageReport(){
+        StringBuilder result = new StringBuilder();
+        for(int i = 0; i<messageIDs.size();i++){
+            result.append("Name: "+names.get(i)).append(" | Cell No: "+recepients.get(i)).append(" | Hash: ").append(messageHashes.get(i)).append(" | Message: ").append(storedMessages.get(i)).append(" | ").append(messageFlag.get(i)).append("\n");
+        }
+        return result.toString();
+    }
+    String messageDeleted;
     public String deleteMessage(String index){
         boolean found = false;
+        
         for(int i = 0;i<messageHashes.size();i++){
             if(messageHashes.get(i).equals(index)){
+                messageDeleted = storedMessages.get(i);
                 storedMessages.remove(i);
                 messageHashes.remove(i);
                 messageIDs.remove(i);
@@ -340,9 +351,10 @@ public class Message {
             }
         }
         if(found)
-        return "Message successfully deleted";
+        return "Message ("+messageDeleted+") successfully deleted";
         else return "Message not found";
     }
+    
     public String returnLongestMessage(){
         String longest = storedMessages.get(0);
         for(int i = 1; i<storedMessages.size();i++){
@@ -357,7 +369,7 @@ public class Message {
         boolean found = false;
         StringBuilder result = new StringBuilder();
         for(int i = 0; i<recepients.size();i++){
-            if(recepients.get(i).replaceAll("^(\\+27|27|0)", "").equalsIgnoreCase(recepient.replaceAll("^(\\+27|27|0)", "")) || names.get(i).equalsIgnoreCase(recepient)){
+            if(recepients.get(i).replaceAll("^(\\+27|27)", "").equalsIgnoreCase(recepient.replaceAll("^(\\+27|27)", "")) || names.get(i).equalsIgnoreCase(recepient)){
                 found = true;
                 result.append(storedMessages.get(i)+"\n");
             }
