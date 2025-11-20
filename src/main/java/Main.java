@@ -23,8 +23,8 @@ public class Main {
         else {
             System.exit(0);
         }
-        u1.restoreMemory();
-        loginStatus = user1.activeStatus;
+        u1.restoreMemory(); //calls for memory restoration after a successful login(failed login kills the program so this only works after successful login)
+        loginStatus = user1.activeStatus; //boolean to validate login status
         while(loginStatus){
         loginStatus = u1.sessionActive;
         u1.mainMenu();

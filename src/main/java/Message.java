@@ -299,7 +299,7 @@ public class Message {
         }
         return sentMessages.toString();
     }
-    public String printDeletedMessages(){
+    public String printDeletedMessages(){ //prints messsages labelled as disregarded(deleted messages disappear from the program but disregarded ones are just flagged)
         StringBuilder sentMessages = new StringBuilder();
         for(int i = 0; i < messageFlag.size();i++){
             if(messageFlag.get(i).equalsIgnoreCase("disregarded")){
@@ -311,7 +311,7 @@ public class Message {
     public int returnTotalMessages(){
         return totalMessagesSent;
      } //shows how many messages were sent
-    public String searchMessageID(String index){
+    public String searchMessageID(String index){ //search message by message id
         boolean found = false;
         StringBuilder result = new StringBuilder();
         for(int i = 0; i<messageIDs.size();i++){
@@ -325,9 +325,9 @@ public class Message {
         return result.toString();
         else return "Message or ID not found";
     }
-    public String showMessageReport(){
+    public String showMessageReport(){ //displays a report of all messages sent
         StringBuilder result = new StringBuilder();
-        for(int i = 0; i<messageIDs.size();i++){
+        for(int i = 0; i<messageIDs.size();i++){ //appends into string builder
             result.append("Name: "+names.get(i)).append(" | Cell No: "+recepients.get(i)).append(" | Hash: ").append(messageHashes.get(i)).append(" | Message: ").append(storedMessages.get(i)).append(" | ").append(messageFlag.get(i)).append("\n");
         }
         return result.toString();
@@ -338,14 +338,14 @@ public class Message {
         
         for(int i = 0;i<messageHashes.size();i++){
             if(messageHashes.get(i).equals(index)){
-                messageDeleted = storedMessages.get(i);
+                messageDeleted = storedMessages.get(i); //keeps the message as a variable for detailed response
                 storedMessages.remove(i);
                 messageHashes.remove(i);
                 messageIDs.remove(i);
                 recepients.remove(i);
                 names.remove(i);
                 messageFlag.remove(i);
-                deleteFromJson(index);
+                deleteFromJson(index); //calls the removing function to delete the message from json file aswell
                 found = true;
                 break;
             }
@@ -355,7 +355,7 @@ public class Message {
         else return "Message not found";
     }
     
-    public String returnLongestMessage(){
+    public String returnLongestMessage(){ //returns the longest message in the stored arrays
         String longest = storedMessages.get(0);
         for(int i = 1; i<storedMessages.size();i++){
             if(storedMessages.get(i).length()>longest.length()){
@@ -365,7 +365,7 @@ public class Message {
         return longest;
     }
     public String searchByRecepient(String recepient){
-        recepient.replaceAll("^(\\+27|27|0)", "");
+        recepient.replaceAll("^(\\+27|27|0)", ""); //trim input incase users use a different format
         boolean found = false;
         StringBuilder result = new StringBuilder();
         for(int i = 0; i<recepients.size();i++){
@@ -377,7 +377,7 @@ public class Message {
         if(found) return result.toString();
         else return "Recepient not found";
     }
-    public void restoreMemory(){
+    public void restoreMemory(){  //reads json files from previous logins to restore data and allow users to later merge data
          try {
         File file = new File("QuickChat/messages.json");
         if (!file.exists()) {

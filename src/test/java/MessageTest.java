@@ -93,15 +93,15 @@ public class MessageTest {
         assertEquals(expectedMessage, msg.printSentMessages());
     }
     @Test
-    void recepientSearchTest(){
+    void recepientSearchTest(){ //tests recepient search function success
         Message msg = new Message();
         msg.storedMessages.add("Did you get the cake?"); msg.names.add("test1"); msg.recepients.add("+27834557896");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("sent");
         msg.storedMessages.add("Where are you? You are late! I have asked you to be on time.");msg.names.add("test2"); msg.recepients.add("+27838884567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("stored");
         msg.storedMessages.add("Yohoooo, I am at your gate.");msg.names.add("test3"); msg.recepients.add("+27834484567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("disregared");
         msg.storedMessages.add("It is dinner time!"); msg.names.add("test4"); msg.recepients.add("0838884567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("sent");
-        msg.storedMessages.add("Ok, I am leaving without you"); msg.names.add("test5"); msg.recepients.add("+27838884567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("stored");
+        msg.storedMessages.add("Ok, I am leaving without you"); msg.names.add("test5"); msg.recepients.add("+27838884567");msg.messageIDs.add(msg.createMessageID());msg.messageFlag.add("stored"); //populaates session arrays with test data
         String expectedMessage = "Where are you? You are late! I have asked you to be on time.\nOk, I am leaving without you\n";
-        assertEquals(expectedMessage, msg.searchByRecepient("27838884567"));
+        assertEquals(expectedMessage, msg.searchByRecepient("+27838884567"));
     }
 
     
